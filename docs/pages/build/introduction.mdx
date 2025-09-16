@@ -1,60 +1,387 @@
----
-title: EAS Build
-sidebar_title: Introduction
-hideTOC: true
-description: EAS Build is a hosted service for building app binaries for your Expo and React Native projects.
----
+import React, { useState, useEffect } from 'react';
+import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 
-import { Cube01Icon } from '@expo/styleguide-icons/outline/Cube01Icon';
+const { width } = Dimensions.get('window');
 
-import { BoxLink } from '~/ui/components/BoxLink';
+const HomeScreen = ({ navigation }) => {
+  const [featuredProducts, setFeaturedProducts] = useState([
+    {
+      id: 1,
+      name: 'نظام الزراعة العمودية الذكي',
+      price: '499 ر.س',
+      originalPrice: '599 ر.س',
+      image: 'https://example.com/smart-vertical.jpg',
+      rating: 4.8,
+      reviews: 47,
+      category: 'أنظمة متكاملة'
+    },
+    {
+      id: 2,
+      name: 'طقم المبتدئين للزراعة المائية',
+      price: '299 ر.س',
+      image: 'https://example.com/starter-kit.jpg',
+      rating: 4.5,
+      reviews: 23,
+      category: 'أنظمة متكاملة'
+    },
+    {
+      id: 3,
+      name: 'بذور الخس المائي العضوية',
+      price: '25 ر.س',
+      image: 'https://example.com/lettuce-seeds.jpg',
+      rating: 4.7,
+      reviews: 15,
+      category: 'مستلزمات'
+    }
+  ]);
 
-**EAS Build** is a hosted service for building app binaries for your Expo and React Native projects.
+  const categories = [
+    { id: 1, name: 'أنظمة كاملة', icon: '🌿', count: 12 },
+    { id: 2, name: 'مستلزمات', icon: '💧', count: 8 },
+    { id: 3, name: 'بذور ونباتات', icon: '🌱', count: 5 },
+    { id: 4, name: 'أدوات', icon: '🛠️', count: 3 }
+  ];
 
-It makes building your apps for distribution simple and easy to automate by providing defaults that work well for Expo and React Native projects out of the box, and by handling your app signing credentials for you (if you wish). It also makes sharing builds with your team easier than ever with [internal distribution](/build/internal-distribution/) (using ad hoc and/or enterprise "universal" provisioning), deeply integrates with EAS Submit for app store submissions, and has first-class support for the [`expo-updates`](/build/updates/) library.
+  return (
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.logo}>نبتة 🌱</Text>
+        <View style={styles.headerIcons}>
+          <TouchableOpacity style={styles.iconButton}>
+            <Text style={styles.icon}>🔍</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.iconButton}>
+            <Text style={styles.icon}>🛒</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
 
-It's designed to work for any native project, whether or not you use Expo and React Native. It's the fastest way to get from `npx create-expo-app` or `npx @react-native-community/cli@latest init` to app stores.
+      {/* Hero Banner */}
+      <View style={styles.heroBanner}>
+        <Image
+          source={{uri: 'https://example.com/hero-banner.jpg'}}
+          style={styles.bannerImage}
+        />
+        <View style={styles.bannerOverlay}>
+          <Text style={styles.bannerTitle}>أنظمة زراعة مائية منزلية ذكية</Text>
+          <Text style={styles.bannerSubtitle}>جودة عالية - أسعار مناسبة - دعم فني</Text>
+          <TouchableOpacity style={styles.ctaButton}>
+            <Text style={styles.ctaText}>اكتشف المنتجات</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
 
-### Get started
+      {/* Categories */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>التصنيفات</Text>
+        <View style={styles.categoriesGrid}>
+          {categories.map(category => (
+            <TouchableOpacity key={category.id} style={styles.categoryItem}>
+              <View style={styles.categoryIcon}>
+                <Text style={styles.categoryEmoji}>{category.icon}</Text>
+              </View>
+              <Text style={styles.categoryName}>{category.name}</Text>
+              <Text style={styles.categoryCount}>({category.count})</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
 
-<BoxLink
-  title="Create your first build"
-  description="It should only take a few minutes in total to get up and running for iOS and/or Android."
-  href="/build/setup"
-  Icon={Cube01Icon}
-/>
+      {/* Featured Products */}
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>المنتجات المميزة</Text>
+          <TouchableOpacity>
+            <Text style={styles.seeAll}>عرض الكل</Text>
+          </TouchableOpacity>
+        </View>
+       
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.productsScroll}>
+          {featuredProducts.map(product => (
+            <TouchableOpacity
+              key={product.id}
+              style={styles.productCard}
+              onPress={() => navigation.navigate('ProductDetail', { product })}
+            >
+              <View style={styles.productBadge}>
+                <Text style={styles.badgeText}>الأكثر مبيعاً</Text>
+              </View>
+              <Image
+                source={{uri: product.image}}
+                style={styles.productImage}
+              />
+              <View style={styles.productDetails}>
+                <Text style={styles.productName}>{product.name}</Text>
+                <View style={styles.priceContainer}>
+                  <Text style={styles.productPrice}>{product.price}</Text>
+                  {product.originalPrice && (
+                    <Text style={styles.originalPrice}>{product.originalPrice}</Text>
+                  )}
+                </View>
+                <View style={styles.ratingContainer}>
+                  <Text style={styles.rating}>⭐ {product.rating}</Text>
+                  <Text style={styles.reviews}>({product.reviews})</Text>
+                </View>
+                <Text style={styles.productCategory}>{product.category}</Text>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
 
-<BoxLink
-  title="Share your apps with internal testers"
-  description="EAS Build can help share preview builds of your app with a single URL."
-  href="/build/internal-distribution"
-  Icon={Cube01Icon}
-/>
+      {/* Promo Section */}
+      <View style={styles.promoSection}>
+        <View style={styles.promoCard}>
+          <Text style={styles.promoTitle}>خصم 20% على أول طلب</Text>
+          <Text style={styles.promoSubtitle}>استخدم الكود: NABTA20</Text>
+          <TouchableOpacity style={styles.promoButton}>
+            <Text style={styles.promoButtonText}>استخدم الخصم</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </ScrollView>
+  );
+};
 
-<BoxLink
-  title="Automate submissions"
-  description="Learn how you can have the service take your successful builds and handle uploading them to app stores for you automatically."
-  href="/build/automate-submissions"
-  Icon={Cube01Icon}
-/>
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f8f9fa',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 15,
+    backgroundColor: '#2e7d32',
+    paddingTop: 40,
+  },
+  logo: {
+    color: 'white',
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  headerIcons: {
+    flexDirection: 'row',
+  },
+  iconButton: {
+    marginLeft: 15,
+  },
+  icon: {
+    fontSize: 20,
+    color: 'white',
+  },
+  heroBanner: {
+    height: 200,
+    margin: 15,
+    borderRadius: 15,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  bannerImage: {
+    width: '100%',
+    height: '100%',
+  },
+  bannerOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    padding: 20,
+  },
+  bannerTitle: {
+    color: 'white',
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  bannerSubtitle: {
+    color: 'white',
+    fontSize: 14,
+    marginBottom: 10,
+  },
+  ctaButton: {
+    backgroundColor: '#ff6f00',
+    padding: 10,
+    borderRadius: 8,
+    alignSelf: 'flex-start',
+  },
+  ctaText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  section: {
+    marginVertical: 20,
+    paddingHorizontal: 15,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#2c3e50',
+  },
+  seeAll: {
+    color: '#2e7d32',
+    fontWeight: '500',
+  },
+  categoriesGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  categoryItem: {
+    width: '48%',
+    alignItems: 'center',
+    marginBottom: 15,
+    backgroundColor: 'white',
+    padding: 15,
+    borderRadius: 10,
+    elevation: 2,
+  },
+  categoryIcon: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+    backgroundColor: '#e8f5e9',
+  },
+  categoryEmoji: {
+    fontSize: 24,
+  },
+  categoryName: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#2c3e50',
+    textAlign: 'center',
+    marginBottom: 4,
+  },
+  categoryCount: {
+    fontSize: 12,
+    color: '#7f8c8d',
+  },
+  productsScroll: {
+    marginHorizontal: -15,
+  },
+  productCard: {
+    width: 250,
+    backgroundColor: 'white',
+    marginRight: 15,
+    borderRadius: 12,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    position: 'relative',
+  },
+  productBadge: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+    backgroundColor: '#ff6f00',
+    padding: 5,
+    borderRadius: 5,
+    zIndex: 1,
+  },
+  badgeText: {
+    color: 'white',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
+  productImage: {
+    width: '100%',
+    height: 150,
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+  },
+  productDetails: {
+    padding: 12,
+  },
+  productName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#2c3e50',
+    marginBottom: 8,
+  },
+  priceContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 5,
+  },
+  productPrice: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#2e7d32',
+  },
+  originalPrice: {
+    fontSize: 12,
+    color: '#95a5a6',
+    textDecorationLine: 'line-through',
+    marginLeft: 8,
+  },
+  ratingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 5,
+  },
+  rating: {
+    fontSize: 12,
+    color: '#f39c12',
+    marginRight: 5,
+  },
+  reviews: {
+    fontSize: 12,
+    color: '#7f8c8d',
+  },
+  productCategory: {
+    fontSize: 11,
+    color: '#2e7d32',
+    backgroundColor: '#e8f5e9',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    alignSelf: 'flex-start',
+  },
+  promoSection: {
+    padding: 15,
+    marginBottom: 20,
+  },
+  promoCard: {
+    backgroundColor: '#2e7d32',
+    padding: 20,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  promoTitle: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  promoSubtitle: {
+    color: 'white',
+    fontSize: 14,
+    marginBottom: 15,
+  },
+  promoButton: {
+    backgroundColor: 'white',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  promoButtonText: {
+    color: '#2e7d32',
+    fontWeight: 'bold',
+  },
+});
 
-<BoxLink
-  title="App version management"
-  description="Automate version bumps so you never have to think about them again."
-  href="/build-reference/app-versions"
-  Icon={Cube01Icon}
-/>
-
-<BoxLink
-  title="Run builds locally or on your own infrastructure"
-  description="EAS Build is a hosted service, but you can also run it on your own machine, for example, to debug or to comply with any company security policies."
-  href="/build-reference/local-builds"
-  Icon={Cube01Icon}
-/>
-
-<BoxLink
-  title="Limitations"
-  description="EAS Build is new and rapidly evolving, so we recommend getting familiar with the current limitations."
-  href="/build-reference/limitations"
-  Icon={Cube01Icon}
-/>
+export default HomeScreen;
