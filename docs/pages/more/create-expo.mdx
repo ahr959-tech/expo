@@ -1,167 +1,296 @@
----
-title: create-expo-app
-maxHeadingDepth: 4
-description: A command-line tool to create a new Expo and React Native project.
----
+# Creating a starter project zip for "Nabta" Home Smart Farm app (React Native + FastAPI backend)
+# This script will create a compact project structure with:
+# - frontend (Expo React Native starter)
+# - backend (FastAPI starter)
+# - database schema (SQL)
+# - sample product catalog (JSON)
+# - README and LICENSE
+# - includes the provided logo image copied into the assets folder
+import os, json, zipfile, shutil, textwrap
 
-import { Terminal } from '~/ui/components/Snippet';
-import { Tab, Tabs } from '~/ui/components/Tabs';
+root = "/mnt/data/nabta_starter"
+if os.path.exists(root):
+    shutil.rmtree(root)
+os.makedirs(root)
 
-`create-expo-app` is a command-line tool to create and set up a new Expo and React Native project. This tool simplifies the initialization process by providing various templates to get started quickly without the need for manual configuration.
+# Copy provided image from container path to assets
+src_logo = "/mnt/data/28C49B9C-04B3-4D4C-B383-0DACE1123414.jpeg"
+assets_dir = os.path.join(root, "frontend", "assets")
+os.makedirs(assets_dir, exist_ok=True)
+if os.path.exists(src_logo):
+    shutil.copy(src_logo, os.path.join(assets_dir, "logo.jpeg"))
 
-## Create a new project
+# README
+readme = textwrap.dedent("""\
+    NABTA - Home Smart Farm
+    Starter project (prototype)
+   
+    What's included:
+    - frontend/: Expo React Native starter app with screens (Auth, Dashboard, System, Store, Product, Cart)
+    - backend/: FastAPI starter with example endpoints (auth, systems, readings, store)
+    - db/schema.sql: simple PostgreSQL schema
+    - data/product_catalog.json: sample product catalog for the in-app store
+    - assets/logo.jpeg: your provided app logo
+   
+    How to run (quick):
+    Frontend (requires Node + expo):
+      cd frontend
+      npm install
+      expo start
+   
+    Backend (requires Python 3.10+):
+      cd backend
+      python -m venv venv
+      source venv/bin/activate
+      pip install -r requirements.txt
+      uvicorn main:app --reload --port 8000
+   
+    Note: This is a starter template. You will need to wire in real databases, auth providers, payment gateway, and device integration (MQTT).
+    """)
 
-To create a new project, run the following command:
+with open(os.path.join(root, "README.md"), "w", encoding="utf-8") as f:
+    f.write(readme)
 
-<Tabs>
-
-<Tab label="npm">
-
-<Terminal cmd={['$ npx create-expo-app@latest']} />
-
-</Tab>
-
-<Tab label="Yarn">
-
-<Terminal cmd={['$ yarn create expo-app']} />
-
-</Tab>
-
-<Tab label="pnpm">
-
-<Terminal cmd={['$ pnpm create expo-app']} />
-
-</Tab>
-
-<Tab label="Bun">
-
-<Terminal cmd={['$ bun create expo']} />
-
-</Tab>
-
-</Tabs>
-
-Running the above command will prompt you to enter the app name of your project. This app name is also used in the app config's [`name`](/versions/latest/config/app/#name) property.
-
-<Terminal cmd={['What is your app named? my-app']} />
-
-## Options
-
-Uses the following options to customize the command behavior.
-
-### `--yes`
-
-Uses the default options to create a new project.
-
-### `--no-install`
-
-Skips installing npm dependencies or CocoaPods.
-
-### `--template`
-
-Running `create-expo-app` with a [Node Package Manager](#node-package-managers-support) initializes and sets up a new Expo project using the default template.
-
-You can use the `--template` option to select one of the following templates or pass it as an argument to the option. For example, `--template default`.
-
-> **info** Looking for more templates? Check out the [`--example`](#--example) option to initialize your project with one of the example apps that demonstrate specific features and integrations.
-
-| Template                                                                                              | Description                                                                                                                                                                           |
-| ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`default`](https://github.com/expo/expo/tree/main/templates/expo-template-default)                   | Default template. Designed to build multi-screen apps. Includes recommended tools such as Expo CLI, Expo Router library and TypeScript configuration enabled. Suitable for most apps. |
-| [`blank`](https://github.com/expo/expo/tree/main/templates/expo-template-blank)                       | Installs minimum required npm dependencies without configuring navigation.                                                                                                            |
-| [`blank-typescript`](https://github.com/expo/expo/tree/main/templates/expo-template-blank-typescript) | A Blank template with TypeScript enabled.                                                                                                                                             |
-| [`tabs`](https://github.com/expo/expo/tree/main/templates/expo-template-tabs)                         | Installs and configures file-based routing with Expo Router and TypeScript enabled.                                                                                                   |
-| [`bare-minimum`](https://github.com/expo/expo/tree/main/templates/expo-template-bare-minimum)         | A Blank template with native directories (**android** and **ios**) generated. Runs [`npx expo prebuild`](/workflow/prebuild/) during the setup.                                       |
-
-### `--example`
-
-Use this option to initialize a project using an example from [expo/examples](https://github.com/expo/examples).
-
-For example:
-
-- Running `npx create-expo-app --example with-router` sets up a project with the Expo Router library
-- Running `npx create-expo-app --example with-react-navigation` sets up a project similar to the default template, but configured with plain React Navigation library
-
-### `--version`
-
-Prints the version number and exits.
-
-### `--help`
-
-Prints the list of available options and exits.
-
-## Node Package Managers support
-
-Creating a new project with `create-expo-app` also handles setting up additional configuration needed for a specific Node Package Manager.
-
-**If you are migrating from one package manager to another**, you've to manually carry out the additional configuration in your project. **If you are using [EAS](/eas/)**, you also have to configure your project for any additional required steps manually.
-
-All the additional steps for each package manager are listed below.
-
-### npm
-
-#### Local installation
-
-npm is installed as part of Node.js installation. See [Node.js documentation](https://nodejs.org/en/download/package-manager) for installation instructions.
-
-#### EAS installation
-
-Supported by default if the project directory contains **package-lock.json**.
-
-### Yarn 1 (Classic)
-
-#### Local installation
-
-Yarn 1 (Classic) is usually installed as a global dependency of npm. See [Yarn 1 documentation](https://classic.yarnpkg.com/en/docs/getting-started) for installation instructions.
-
-#### EAS installation
-
-Supported by default if the project directory contains **yarn.lock**.
-
-### Yarn 2+ (Modern)
-
-#### Local installation
-
-See [Yarn documentation](https://yarnpkg.com/getting-started/install) for installation instructions.
-
-Yarn 2+ handles package management differently than Yarn 1. One of the core changes in Yarn 2+ is the [Plug'n'Play (PnP)](https://yarnpkg.com/features/pnp) node linking model that does not work with React Native.
-
-By default, a project created with `create-expo-app` and Yarn 2+ uses [`nodeLinker`](https://yarnpkg.com/features/linkers#nodelinker-node-modules) with its value set to `node-modules` to install dependencies.
-
-```yaml .yarnrc.yml
-nodeLinker: node-modules
-```
-
-#### EAS installation
-
-Yarn Modern on EAS requires adding [`eas-build-pre-install` hook](/build-reference/npm-hooks/). In your project's **package.json**, add the following configuration:
-
-```json package.json
-{
-  "scripts": {
-    "eas-build-pre-install": "corepack enable && yarn set version 4"
-  }
+# Frontend files (minimal Expo app)
+frontend_files = {
+    "package.json": textwrap.dedent("""\
+    {
+      "name": "nabta-app",
+      "version": "1.0.0",
+      "main": "node_modules/expo/AppEntry.js",
+      "scripts": {
+        "start": "expo start",
+        "android": "expo start --android",
+        "ios": "expo start --ios"
+      },
+      "dependencies": {
+        "expo": "~48.0.0",
+        "react": "18.2.0",
+        "react-native": "0.71.8",
+        "react-navigation": "^4.4.4",
+        "react-native-gesture-handler": "~2.5.0",
+        "axios": "^1.4.0"
+      }
+    }
+    """),
+    "App.js": textwrap.dedent("""\
+    import React from 'react';
+    import { NavigationContainer } from '@react-navigation/native';
+    import { createNativeStackNavigator } from '@react-navigation/native-stack';
+    import { View, Text, Image, TouchableOpacity } from 'react-native';
+    import Dashboard from './screens/Dashboard';
+    import Store from './screens/Store';
+    import Product from './screens/Product';
+   
+    const Stack = createNativeStackNavigator();
+   
+    export default function App() {
+      return (
+        <NavigationContainer>
+          <Stack.Navigator initialRouteName="Dashboard">
+            <Stack.Screen name="Dashboard" component={Dashboard} />
+            <Stack.Screen name="Store" component={Store} />
+            <Stack.Screen name="Product" component={Product} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      );
+    }
+    """),
 }
-```
 
-### pnpm
+screens_dir = os.path.join(root, "frontend", "screens")
+os.makedirs(screens_dir, exist_ok=True)
 
-#### Local installation
+dashboard_js = textwrap.dedent("""\
+    import React from 'react';
+    import { View, Text, Button, Image, StyleSheet } from 'react-native';
+    export default function Dashboard({ navigation }) {
+      return (
+        <View style={styles.container}>
+          <Image source={require('../assets/logo.jpeg')} style={styles.logo} />
+          <Text style={styles.title}>NABTA — مزرعة ذكية منزلية</Text>
+          <Text>لوحة تحكم مبسطة: قراءات حية، أنظمة، وصفات.</Text>
+          <Button title="المتجر" onPress={() => navigation.navigate('Store')} />
+        </View>
+      );
+    }
+    const styles = StyleSheet.create({
+      container: { flex:1, alignItems:'center', justifyContent:'center', padding:20 },
+      logo: { width:120, height:120, resizeMode:'contain', marginBottom:10 },
+      title: { fontSize:18, fontWeight:'bold', marginBottom:8 }
+    });
+    """)
 
-Requires installing Node.js. See [pnpm documentation](https://pnpm.io/installation) for installation instructions.
+store_js = textwrap.dedent("""\
+    import React, {useEffect, useState} from 'react';
+    import { View, Text, FlatList, TouchableOpacity } from 'react-native';
+    import products from '../data/product_catalog.json';
+   
+    export default function Store({ navigation }) {
+      return (
+        <View style={{flex:1, padding:16}}>
+          <Text style={{fontSize:18,fontWeight:'bold', marginBottom:8}}>متجر المعدات</Text>
+          <FlatList data={products} keyExtractor={i=>i.id} renderItem={({item})=>(
+            <TouchableOpacity onPress={()=>navigation.navigate('Product',{product:item})} style={{padding:10,borderBottomWidth:1}}>
+              <Text style={{fontSize:16}}>{item.name} — {item.price} USD</Text>
+              <Text style={{color:'#666'}}>{item.short}</Text>
+            </TouchableOpacity>
+          )} />
+        </View>
+      );
+    }
+    """)
 
-By default, a project created with `create-expo-app` and pnpm uses [`node-linker`](https://pnpm.io/npmrc#node-linker) with its value set to `hoisted` to install dependencies.
+product_js = textwrap.dedent("""\
+    import React from 'react';
+    import { View, Text, Button } from 'react-native';
+    export default function Product({ route }) {
+      const product = route.params.product;
+      return (
+        <View style={{flex:1,padding:16}}>
+          <Text style={{fontSize:20,fontWeight:'bold'}}>{product.name}</Text>
+          <Text style={{marginVertical:8}}>{product.description}</Text>
+          <Text style={{fontSize:18, fontWeight:'600'}}>{product.price} USD</Text>
+          <Button title="أضف للسلة (محاكاة)" onPress={()=>alert('تمت إضافة المنتج للسلة (محاكاة)')} />
+        </View>
+      );
+    }
+    """)
 
-```ini .npmrc
-node-linker=hoisted
-```
+with open(os.path.join(screens_dir, "Dashboard.js"), "w", encoding="utf-8") as f:
+    f.write(dashboard_js)
+with open(os.path.join(screens_dir, "Store.js"), "w", encoding="utf-8") as f:
+    f.write(store_js)
+with open(os.path.join(screens_dir, "Product.js"), "w", encoding="utf-8") as f:
+    f.write(product_js)
 
-> **info** From **SDK 54**, Expo supports isolated installations, and you can delete the `node-linker` setting if you prefer to use isolated dependencies.
+# sample product catalog JSON
+data_dir = os.path.join(root, "frontend", "data")
+os.makedirs(data_dir, exist_ok=True)
+product_catalog = [
+    {"id":"p1","name":"مجموعة بدء الهيدروبونيك (Kit)","short":"حامل، مضخة، خزان، أنابيب","description":"مجموعة متكاملة للمبتدئين تحتوي على مضخة مياه، خزان 10L، أنابيب، وتعليمات.","price":129},
+    {"id":"p2","name":"مضخة مياه غاطسة صغيرة","short":"5W - تدفق 400L/H","description":"مضخة غاطسة فعالة لأنظمة صغيرة. مناسبة لأرفف الزراعة المنزلية.","price":25},
+    {"id":"p3","name":"مضخة جرعات Peristaltic","short":"للتسميد الدقيق","description":"مضخة جرعات بتحكم رقمي لتوزيع المغذيات بدقة.","price":89},
+    {"id":"p4","name":"حساس pH (Probe)","short":"للمعايرة وقراءة pH","description":"مجس pH رقمي مع سلك طويل، مناسب للأنظمة المنزلية.","price":49}
+]
+with open(os.path.join(data_dir, "product_catalog.json"), "w", encoding="utf-8") as f:
+    json.dump(product_catalog, f, ensure_ascii=False, indent=2)
 
-#### EAS installation
+# Backend FastAPI starter
+backend_dir = os.path.join(root, "backend")
+os.makedirs(backend_dir, exist_ok=True)
+main_py = textwrap.dedent("""\
+    from fastapi import FastAPI, HTTPException
+    from pydantic import BaseModel
+    from typing import List
+    app = FastAPI(title='Nabta API (starter)')
+   
+    class Product(BaseModel):
+        id: str
+        name: str
+        short: str
+        description: str
+        price: float
+   
+    @app.get('/health')
+    def health():
+        return {'status':'ok'}
+   
+    # sample products - in prod load from DB
+    PRODUCTS = []
+    try:
+        import json, os
+        fn = os.path.join(os.path.dirname(__file__), '..','frontend','data','product_catalog.json')
+        with open(fn, 'r', encoding='utf-8') as fh:
+            PRODUCTS = json.load(fh)
+    except Exception:
+        PRODUCTS = []
+   
+    @app.get('/store', response_model=List[Product])
+    def list_products():
+        return PRODUCTS
+   
+    @app.get('/store/{product_id}', response_model=Product)
+    def get_product(product_id: str):
+        for p in PRODUCTS:
+            if p['id']==product_id:
+                return p
+        raise HTTPException(status_code=404, detail='product not found')
+    """)
 
-Supported by default if the project directory contains **pnpm-lock.yaml**.
+with open(os.path.join(backend_dir, "main.py"), "w", encoding="utf-8") as f:
+    f.write(main_py)
 
-### Bun
+requirements = "fastapi\nuvicorn\npydantic\n"
+with open(os.path.join(backend_dir, "requirements.txt"), "w", encoding="utf-8") as f:
+    f.write(requirements)
 
-See [Bun](/guides/using-bun/) guide for details on creating a new Expo project with `bun`, migration from another package manager, and usage with EAS.
+# DB schema
+db_schema = textwrap.dedent("""\
+    -- Simple PostgreSQL schema for NABTA starter
+    CREATE TABLE users (
+      id SERIAL PRIMARY KEY,
+      name TEXT,
+      email TEXT UNIQUE,
+      hashed_password TEXT,
+      role TEXT,
+      created_at TIMESTAMP DEFAULT now()
+    );
+    CREATE TABLE systems (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER REFERENCES users(id),
+      name TEXT,
+      location TEXT,
+      hardware_info JSONB,
+      created_at TIMESTAMP DEFAULT now()
+    );
+    CREATE TABLE sensor_readings (
+      id BIGSERIAL PRIMARY KEY,
+      system_id INTEGER REFERENCES systems(id),
+      timestamp TIMESTAMP DEFAULT now(),
+      ph NUMERIC,
+      ec NUMERIC,
+      temp_c NUMERIC,
+      water_level NUMERIC,
+      light_lux NUMERIC
+    );
+    CREATE TABLE products (
+      id TEXT PRIMARY KEY,
+      name TEXT,
+      short TEXT,
+      description TEXT,
+      price NUMERIC
+    );
+    """)
+with open(os.path.join(root, "db_schema.sql"), "w", encoding="utf-8") as f:
+    f.write(db_schema)
+
+# API examples JSON
+api_examples = {
+    "GET /health": {"status":"ok"},
+    "GET /store": product_catalog,
+    "GET /store/p1": product_catalog[0]
+}
+with open(os.path.join(root, "api_examples.json"), "w", encoding="utf-8") as f:
+    json.dump(api_examples, f, ensure_ascii=False, indent=2)
+
+# README license
+with open(os.path.join(root, "LICENSE"), "w", encoding="utf-8") as f:
+    f.write("MIT License")
+
+# write frontend files
+for fname, content in frontend_files.items():
+    with open(os.path.join(root, "frontend", fname), "w", encoding="utf-8") as f:
+        f.write(content)
+
+# write package data files (data already present)
+# zip the folder
+zip_path = "/mnt/data/nabta_starter.zip"
+with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as z:
+    for folder, subs, files in os.walk(root):
+        for file in files:
+            full = os.path.join(folder, file)
+            arc = os.path.relpath(full, start=root)
+            z.write(full, arcname=arc)
+
+zip_path
